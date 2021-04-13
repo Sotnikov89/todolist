@@ -2,12 +2,15 @@ package ru.job4j.todolist.dao;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import ru.job4j.todolist.model.Item;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class DaoItem implements Dao<Item> {
 
@@ -16,82 +19,59 @@ public class DaoItem implements Dao<Item> {
     private final SessionFactory sf = new MetadataSources(registry)
             .buildMetadata().buildSessionFactory();
 
-    @Override
-    public Item findById(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
+    private <T> T tx(final Function<Session, T> command) {
+        final Session session = sf.openSession();
+        final Transaction tx = session.beginTransaction();
         try {
-            Item item = session.get(Item.class, id);
-            session.getTransaction().commit();
-            return item;
-        } catch (Exception exception) {
+            T rsl = command.apply(session);
+            tx.commit();
+            return rsl;
+        } catch (final Exception e) {
             session.getTransaction().rollback();
-            throw exception;
+            throw e;
         } finally {
             session.close();
         }
+    }
+
+    private void txs(final Consumer<Session> command) {
+        final Session session = sf.openSession();
+        final Transaction tx = session.beginTransaction();
+        try {
+            command.accept(session);
+            tx.commit();
+        } catch (final Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public Item findById(int id) {
+        return tx(session -> session.get(Item.class, id));
     }
 
     @Override
     public List<Item> findAll() {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        try {
-            List<Item> items = session.createQuery("FROM Item").list();
-            session.getTransaction().commit();
-            return items;
-        } catch (Exception exception) {
-            session.getTransaction().rollback();
-            throw exception;
-        } finally {
-            session.close();
-        }
+        return tx(session -> session.createQuery("FROM Item").list());
     }
 
     @Override
     public Item save(Item item) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        try {
-            int id = (Integer) session.save(item);
-            session.getTransaction().commit();
-            item.setId(id);
-            return item;
-        } catch (Exception exception) {
-            session.getTransaction().rollback();
-            throw exception;
-        } finally {
-            session.close();
-        }
+        int id = (Integer) tx(session -> session.save(item));
+        item.setId(id);
+        return item;
     }
 
     @Override
     public void update(Item item) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        try {
-            session.update(item);
-            session.getTransaction().commit();
-        } catch (Exception exception) {
-            session.getTransaction().rollback();
-            throw exception;
-        } finally {
-            session.close();
-        }
+        txs(session -> session.update(item));
     }
 
     @Override
     public void delete(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        try {
-            session.delete(Item.builder().id(id).build());
-            session.getTransaction().commit();
-        } catch (Exception exception) {
-            session.getTransaction().rollback();
-            throw exception;
-        } finally {
-            session.close();
-        }
+        txs(session -> session.delete(Item.builder().id(id).build()));
     }
 }
