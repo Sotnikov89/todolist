@@ -12,15 +12,12 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item")
-public class Item {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String description;
-    private String created;
-    private boolean done;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private String name;
+    private String email;
+    private String password;
 }

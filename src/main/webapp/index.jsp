@@ -28,13 +28,16 @@
                 let id = data.id;
                 $("#itemsList").after(
                     "<div class='row'>" +
-                        "<div class='col-8 col-md-5'>" +
+                        "<div class='col-10 col-md-5'>" +
                             "<input type='text' class='form-control' id='desc" + id + "' value='" + data.description + "'>" +
                         "</div>" +
-                        "<div class='col-8 col-md-2'>" +
+                        "<div class='col-10 col-md-2'>" +
                             "<input type='text' class='form-control' id='day" + id + "' value='" + data.created + "' readonly>" +
                         "</div>" +
-                        "<div class='col-8 col-md-1'>" +
+                        "<div class='col-10 col-md-2'>" +
+                            "<input type='text' class='form-control' id='user" + id + "' value='" + data.user.name + "' readonly>" +
+                        "</div>" +
+                        "<div class='col-10 col-md-1'>" +
                             "<input type='checkbox' class='form-check-input' id='status" + id + "'" + data.done + " onclick='updateItem("+id+")'>" +
                         "</div>" +
                     "</div>"
@@ -68,19 +71,23 @@
                     let id = data[i].id;
                     let description = data[i].description;
                     let day = data[i].created;
+                    let name = data[i].user.name;
                     let status;
                     if (data[i].done) {
                         status=" checked";
                     }
                     $("#itemsList").after(
                         "<div class='row'>" +
-                            "<div class='col-8 col-md-5'>" +
+                            "<div class='col-10 col-md-5'>" +
                                 "<input type='text' class='form-control' id='desc" + id + "' value='" + description + "'>" +
                             "</div>" +
-                            "<div class='col-8 col-md-2'>" +
+                            "<div class='col-10 col-md-2'>" +
                                 "<input type='text' class='form-control' id='day" + id + "' value='" + day + "' readonly>" +
                             "</div>" +
-                            "<div class='col-8 col-md-1'>" +
+                            "<div class='col-10 col-md-2'>" +
+                                "<input type='text' class='form-control' id='user" + id + "' value='" + name + "' readonly>" +
+                            "</div>" +
+                            "<div class='col-10 col-md-1'>" +
                                 "<input type='checkbox' class='form-check-input' name='check' id='status" + id + "'" + status + " onclick='updateItem("+id+")'>" +
                             "</div>" +
                         "</div>"
@@ -109,30 +116,37 @@
 <body>
 <div class="container">
     <div class="row pt-5">
-        <div class="col-6">
+        <div class="col-10 col-md-8">
             <h5>Новая задача</h5>
+        </div>
+        <div class="col-10 col-md-2">
+            <a class="nav-link" href="<%=request.getContextPath()%>/auth">
+                <%=request.getSession().getAttribute("userName")%> -> Выйти</a>
         </div>
     </div>
     <div class="row">
-        <div class="col-8 col-md-7">
+        <div class="col-10 col-md-9">
             <input type="text" class="form-control" id="newDesc" placeholder="Опишите задачу">
         </div>
-        <div class="col-8 col-md-1 text-center">
+        <div class="col-10 col-md-1 text-center">
             <button type="button" class="btn btn-success" onclick="addNewItem()">Добавить</button>
         </div>
     </div>
     <div class="row pt-5">
-        <div class="col-8 col-md-3 form-check form-switch">
+        <div class="col-10 col-md-3 form-check form-switch">
             <input class="form-check-input" type="checkbox" id="switch" onclick="hideDoneItem()">
             <label class="form-check-label" for="switch">Только незавершенные</label>
         </div>
     </div>
     <div class="row pb-3" id="itemsList">
-        <div class="col-8 col-md-5">
+        <div class="col-10 col-md-5">
             <h5>Описание задач</h5>
         </div>
         <div class="col-8 col-md-2">
             <h5>Создана</h5>
+        </div>
+        <div class="col-8 col-md-2">
+            <h5>Автор</h5>
         </div>
         <div class="col-8 col-md-1">
             <h5>Статус</h5>

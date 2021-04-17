@@ -35,7 +35,6 @@ public class HibernateServiceItem implements ServiceItem {
     @Override
     public void update(Item item) {
         daoItem.update(item);
-
     }
 
     @Override

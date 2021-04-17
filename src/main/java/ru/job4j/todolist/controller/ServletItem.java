@@ -2,9 +2,9 @@ package ru.job4j.todolist.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.job4j.todolist.model.Item;
+import ru.job4j.todolist.model.User;
 import ru.job4j.todolist.service.HibernateServiceItem;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @WebServlet(name = "ServletItem", urlPatterns = "/items")
 public class ServletItem extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String string = new ObjectMapper().writeValueAsString(HibernateServiceItem.instOf().findAll());
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("json");
@@ -24,7 +24,7 @@ public class ServletItem extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int id = Integer.parseInt(req.getParameter("id"));
         String desc = req.getParameter("description");
         if (id != 0) {
@@ -33,6 +33,7 @@ public class ServletItem extends HttpServlet {
                     .description(desc)
                     .created(req.getParameter("day"))
                     .done(req.getParameter("status").equals("true"))
+                    .user((User) req.getSession().getAttribute("user"))
                     .build();
             HibernateServiceItem.instOf().update(item);
         } else {
@@ -41,6 +42,7 @@ public class ServletItem extends HttpServlet {
                     .description(desc)
                     .created(LocalDateTime.now().format(formatter))
                     .done(false)
+                    .user((User) req.getSession().getAttribute("user"))
                     .build();
             String string = new ObjectMapper().writeValueAsString(HibernateServiceItem.instOf().save(item));
             resp.setCharacterEncoding("UTF-8");
