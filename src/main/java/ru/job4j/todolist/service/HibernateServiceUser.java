@@ -9,9 +9,7 @@ public class HibernateServiceUser implements ServiceUser {
 
     private final DaoUser daoUser;
 
-    public HibernateServiceUser() {
-        this.daoUser = new DaoUser();
-    }
+    public HibernateServiceUser() { this.daoUser = new DaoUser(); }
 
     public static HibernateServiceUser instOf() {
         return new HibernateServiceUser();

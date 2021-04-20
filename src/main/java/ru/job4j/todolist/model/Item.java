@@ -1,11 +1,10 @@
 package ru.job4j.todolist.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -20,7 +19,12 @@ public class Item {
     private String description;
     private String created;
     private boolean done;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToMany (fetch = FetchType.EAGER)
+    private List<Category> categories = new ArrayList<>();
 }

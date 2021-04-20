@@ -17,5 +17,6 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
         <mapping class="ru.job4j.todolist.model.Item" />
         <mapping class="ru.job4j.todolist.model.User" />
+        <mapping class="ru.job4j.todolist.model.Category" />
     </session-factory>
 </hibernate-configuration>

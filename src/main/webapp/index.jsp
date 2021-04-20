@@ -18,30 +18,43 @@
     <title>Список дел</title>
     <script>
         function addNewItem() {
-            const item = {id: 0, description: $("#newDesc").val()};
+            const item = {id: 0, description: $("#newDesc").val(), categories: $('#newCat').val()};
             $.ajax({
                 type: 'POST',
                 url: 'http://localhost:8080/todolist/items',
                 dataType: 'json',
                 data: item,
             }).done(function(data) {
-                let id = data.id;
+                let categoryList = data.categories;
+                let status;
+                if (data.done) {
+                    status=" checked";
+                }
                 $("#itemsList").after(
-                    "<div class='row'>" +
-                        "<div class='col-10 col-md-5'>" +
-                            "<input type='text' class='form-control' id='desc" + id + "' value='" + data.description + "'>" +
-                        "</div>" +
-                        "<div class='col-10 col-md-2'>" +
-                            "<input type='text' class='form-control' id='day" + id + "' value='" + data.created + "' readonly>" +
-                        "</div>" +
-                        "<div class='col-10 col-md-2'>" +
-                            "<input type='text' class='form-control' id='user" + id + "' value='" + data.user.name + "' readonly>" +
+                    "<div class='row pb-2 gx-1'>" +
+                        "<div class='col-10 col-md-6'>" +
+                            "<input type='text' class='form-control' id='desc" + data.id + "' value='" + data.description + "' readonly>" +
                         "</div>" +
                         "<div class='col-10 col-md-1'>" +
-                            "<input type='checkbox' class='form-check-input' id='status" + id + "'" + data.done + " onclick='updateItem("+id+")'>" +
+                            "<select class='form-select' aria-label='multiple select example' id='cat" + data.id +  "' disabled>" +
+                            "</select>" +
+                        "</div>" +
+                        "<div class='col-10 col-md-1'>" +
+                            "<input type='text' class='form-control' id='day" + data.id + "' value='" + data.created + "' readonly>" +
+                        "</div>" +
+                        "<div class='col-10 col-md-1'>" +
+                            "<input type='text' class='form-control' id='user" + data.id + "' value='" + data.user.name + "' readonly>" +
+                        "</div>" +
+                        "<div class='col-10 col-md-1'>" +
+                            "<input type='checkbox' class='form-check-input' name='check' id='status" + data.id + "'" + status + " onclick='updateItem("+data.id+")'>" +
                         "</div>" +
                     "</div>"
                 )
+                for (let y=0; y<categoryList.length; y++) {
+                    let select = document.getElementById("cat" + data.id);
+                    select.size = categoryList.length;
+                    select.append(new Option(categoryList[y].name, categoryList[y].id))
+                }
             }).fail(function (err) {
                 alert(err);
             });
@@ -68,34 +81,54 @@
             dataType: 'json',
             }).done(function(data) {
                 for(let i=0; i<data.length; i++) {
-                    let id = data[i].id;
-                    let description = data[i].description;
-                    let day = data[i].created;
-                    let name = data[i].user.name;
+                    let categoryList = data[i].categories;
                     let status;
                     if (data[i].done) {
                         status=" checked";
                     }
                     $("#itemsList").after(
-                        "<div class='row'>" +
-                            "<div class='col-10 col-md-5'>" +
-                                "<input type='text' class='form-control' id='desc" + id + "' value='" + description + "'>" +
-                            "</div>" +
-                            "<div class='col-10 col-md-2'>" +
-                                "<input type='text' class='form-control' id='day" + id + "' value='" + day + "' readonly>" +
-                            "</div>" +
-                            "<div class='col-10 col-md-2'>" +
-                                "<input type='text' class='form-control' id='user" + id + "' value='" + name + "' readonly>" +
+                        "<div class='row pb-2 gx-1'>" +
+                            "<div class='col-10 col-md-6'>" +
+                                "<input type='text' class='form-control' id='desc" + data[i].id + "' value='" + data[i].description + "' readonly>" +
                             "</div>" +
                             "<div class='col-10 col-md-1'>" +
-                                "<input type='checkbox' class='form-check-input' name='check' id='status" + id + "'" + status + " onclick='updateItem("+id+")'>" +
+                                "<select class='form-select' aria-label='multiple select example' id='cat" + data[i].id +  "' disabled>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class='col-10 col-md-1'>" +
+                                "<input type='text' class='form-control' id='day" + data[i].id + "' value='" + data[i].created + "' readonly>" +
+                            "</div>" +
+                            "<div class='col-10 col-md-1'>" +
+                                "<input type='text' class='form-control' id='user" + data[i].id + "' value='" + data[i].user.name + "' readonly>" +
+                            "</div>" +
+                            "<div class='col-10 col-md-1 justify-content-center'>" +
+                                "<input type='checkbox' class='form-check-input'  name='check' id='status" + data[i].id + "'" + status + " onclick='updateItem("+data[i].id+")'>" +
                             "</div>" +
                         "</div>"
-                )
-            }
-        }).fail(function(err){
-            alert(err);
-        });
+                    )
+                    for (let y=0; y<categoryList.length; y++) {
+                        let select = document.getElementById("cat" + data[i].id);
+                        select.size = categoryList.length;
+                        select.append(new Option(categoryList[y].name, categoryList[y].id))
+                    }
+                }
+            }).fail(function(err){
+                alert(err);
+            });
+        })
+        $(document).ready( function() {
+            $.ajax({
+                type: 'GET',
+                url: 'http://localhost:8080/todolist/category',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+            }).done(function(data) {
+                for(let i=0; i<data.length; i++) {
+                    $("#newCat").append(new Option(data[i].name, data[i].id))
+                }
+            }).fail(function(err){
+                alert(err);
+            });
         })
 
         function hideDoneItem() {
@@ -115,7 +148,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="row pt-5">
+    <div class="row pt-5 gx-1">
         <div class="col-10 col-md-8">
             <h5>Новая задача</h5>
         </div>
@@ -124,9 +157,13 @@
                 <%=request.getSession().getAttribute("userName")%> -> Выйти</a>
         </div>
     </div>
-    <div class="row">
-        <div class="col-10 col-md-9">
+    <div class="row gx-1">
+        <div class="col-10 col-md-8">
             <input type="text" class="form-control" id="newDesc" placeholder="Опишите задачу">
+        </div>
+        <div class="col-10 col-md-1">
+            <select class='form-select' id="newCat" size="1" multiple="multiple" aria-label='multiple select example'>
+            </select>
         </div>
         <div class="col-10 col-md-1 text-center">
             <button type="button" class="btn btn-success" onclick="addNewItem()">Добавить</button>
@@ -139,16 +176,19 @@
         </div>
     </div>
     <div class="row pb-3" id="itemsList">
-        <div class="col-10 col-md-5">
+        <div class="col-10 col-md-6">
             <h5>Описание задач</h5>
         </div>
-        <div class="col-8 col-md-2">
+        <div class="col-10 col-md-1">
+            <h5>Категория</h5>
+        </div>
+        <div class="col-10 col-md-1">
             <h5>Создана</h5>
         </div>
-        <div class="col-8 col-md-2">
+        <div class="col-10 col-md-1">
             <h5>Автор</h5>
         </div>
-        <div class="col-8 col-md-1">
+        <div class="col-10 col-md-1">
             <h5>Статус</h5>
         </div>
     </div>
