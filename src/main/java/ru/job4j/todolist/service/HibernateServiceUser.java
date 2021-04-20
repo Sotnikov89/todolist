@@ -40,6 +40,7 @@ public class HibernateServiceUser implements ServiceUser {
         daoUser.delete(id);
     }
 
+    @Override
     public User findUserByEmail(String email) {
         return daoUser.findUserByEmail(email);
     }

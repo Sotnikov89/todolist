@@ -1,6 +1,6 @@
 package ru.job4j.todolist.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import ru.job4j.todolist.service.HibernateServiceCategory;
 
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class ServletCategory extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String string = new ObjectMapper().writeValueAsString(HibernateServiceCategory.instOf().findAll());
+        String string = new Gson().toJson(HibernateServiceCategory.instOf().findAll());
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("json");
         resp.getWriter().write(string);

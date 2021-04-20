@@ -39,4 +39,11 @@ public class HibernateServiceItem implements ServiceItem {
     public void delete(int id) {
         daoItem.delete(id);
     }
+
+    @Override
+    public void updateStatusById(int id, boolean status) {
+        Item item = findById(id);
+        item.setDone(status);
+        daoItem.update(item);
+    }
 }

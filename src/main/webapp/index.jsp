@@ -25,6 +25,7 @@
                 dataType: 'json',
                 data: item,
             }).done(function(data) {
+                let created = data.created.time.hour + ":" + data.created.time.minute + " " + data.created.date.day + "-" + data.created.date.month;
                 let categoryList = data.categories;
                 let status;
                 if (data.done) {
@@ -40,13 +41,14 @@
                             "</select>" +
                         "</div>" +
                         "<div class='col-10 col-md-1'>" +
-                            "<input type='text' class='form-control' id='day" + data.id + "' value='" + data.created + "' readonly>" +
+                            "<input type='text' class='form-control' id='day" + data.id + "' value='" + created + "' readonly>" +
                         "</div>" +
                         "<div class='col-10 col-md-1'>" +
                             "<input type='text' class='form-control' id='user" + data.id + "' value='" + data.user.name + "' readonly>" +
                         "</div>" +
-                        "<div class='col-10 col-md-1'>" +
-                            "<input type='checkbox' class='form-check-input' name='check' id='status" + data.id + "'" + status + " onclick='updateItem("+data.id+")'>" +
+                        "<div class='col-10 col-md-1 justify-content-center'>" +
+                            "<input type='checkbox' class='btn-check'  name='check' id='status" + data.id + "'" + status + " onclick='updateItem("+data.id+")'>" +
+                            "<label class='btn btn-primary' for='status" + data.id + "' id='lab" + data.id + "'>" + st + "</label>" +
                         "</div>" +
                     "</div>"
                 )
@@ -61,16 +63,19 @@
         }
 
         function updateItem(id) {
-            let descInput = document.getElementById("desc" + id);
             let status = document.getElementById("status" + id);
-            let day = document.getElementById("day" + id);
-            const item = {id: id, description: descInput.value, day: day.value, status: status.checked};
+            const item = {id: id, status: status.checked};
             $.ajax({
                 type: 'POST',
                 url: 'http://localhost:8080/todolist/items',
                 dataType: 'json',
                 data: item,
             });
+            if (status.checked) {
+                document.getElementById("lab" + id).innerHTML = 'Выполнена';
+            } else {
+                document.getElementById("lab" + id).innerHTML = 'Активна';
+            }
         }
 
         $(document).ready( function() {
@@ -81,10 +86,13 @@
             dataType: 'json',
             }).done(function(data) {
                 for(let i=0; i<data.length; i++) {
+                    let created = data[i].created.time.hour + ":" + data[i].created.time.minute + " " + data[i].created.date.day + "-" + data[i].created.date.month;
                     let categoryList = data[i].categories;
                     let status;
+                    let st = "Активна"
                     if (data[i].done) {
                         status=" checked";
+                        st = "Выполнена";
                     }
                     $("#itemsList").after(
                         "<div class='row pb-2 gx-1'>" +
@@ -96,13 +104,14 @@
                                 "</select>" +
                             "</div>" +
                             "<div class='col-10 col-md-1'>" +
-                                "<input type='text' class='form-control' id='day" + data[i].id + "' value='" + data[i].created + "' readonly>" +
+                                "<input type='text' class='form-control' id='day" + data[i].id + "' value='" + created + "' readonly>" +
                             "</div>" +
                             "<div class='col-10 col-md-1'>" +
                                 "<input type='text' class='form-control' id='user" + data[i].id + "' value='" + data[i].user.name + "' readonly>" +
                             "</div>" +
                             "<div class='col-10 col-md-1 justify-content-center'>" +
-                                "<input type='checkbox' class='form-check-input'  name='check' id='status" + data[i].id + "'" + status + " onclick='updateItem("+data[i].id+")'>" +
+                                "<input type='checkbox' class='btn-check'  name='check' id='status" + data[i].id + "'" + status + " onclick='updateItem("+data[i].id+")'>" +
+                                "<label class='btn btn-primary' for='status" + data[i].id + "' id='lab" + data[i].id + "'>" + st + "</label>" +
                             "</div>" +
                         "</div>"
                     )

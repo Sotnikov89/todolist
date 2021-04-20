@@ -3,6 +3,7 @@ package ru.job4j.todolist.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String description;
-    private String created;
+    private LocalDateTime created;
     private boolean done;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
